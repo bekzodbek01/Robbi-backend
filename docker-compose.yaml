@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/Robbi
+      - static_volume:/Robbi/staticfiles
+      - media_volume:/Robbi/mediafiles
+    ports:
+      - "8005:8000"
+    depends_on:
+      - db_robbi
+
+  db_robbi:  # HOST = db_robbi
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: robbi_db         # settings.py da NAME
+      POSTGRES_USER: robbi_user     # settings.py da USER
+      POSTGRES_PASSWORD: robbi_password  # settings.py da PASSWORD
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
+  static_volume:
+  media_volume:
