@@ -1,10 +1,10 @@
-db.sqlite3
-.idea
+d.venv
 venv
-.venv
 env
-.env
-media
+.idea
 __pycache__
+*.sqlite3
+mediafiles
 staticfiles
-.idea/
+media
+static
