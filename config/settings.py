@@ -91,7 +91,7 @@ DATABASES = {
         'USER': 'robbi_user',
         'PASSWORD': 'robbi_password',
         'HOST': 'db_robbi',
-        'PORT': '5432',  # Mahalliy port (Docker Compose faylidan)
+        'PORT': '5432',  # Mahalliy port (Docker Compose faylidan)..
     }
 }
 
