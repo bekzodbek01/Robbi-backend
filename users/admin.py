@@ -1,3 +1,29 @@
 from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from .models import User, EmailVerificationCode
 
-# Register your models here.
+
+@admin.register(User)
+class UserAdmin(BaseUserAdmin):
+    model = User
+    list_display = ('fullname', 'email', 'is_active', 'is_staff')
+    list_filter = ('is_active', 'is_staff')
+    search_fields = ('fullname', 'email')
+    ordering = ('date_joined',)
+
+    fieldsets = (
+        (None, {'fields': ('fullname', 'email', 'password')}),
+        ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser')}),
+        ('Important dates', {'fields': ('last_login', 'date_joined')}),
+        ('Groups & Permissions', {'fields': ('groups', 'user_permissions')}),
+    )
+
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields': ('fullname', 'email', 'password1', 'password2', 'is_active', 'is_staff', 'is_superuser')}
+        ),
+    )
+
+
+admin.site.register(EmailVerificationCode)

@@ -1,75 +1,93 @@
-import random
-from django.core.mail import send_mail
-from django.utils import timezone
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from django.contrib.auth import get_user_model
+from .models import EmailVerificationCode
+from .serializers import *
+from .utils import send_verification_code
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from .models import User, EmailVerificationCode
-# Kod yuborish view
+User = get_user_model()
 
 
 class RegisterView(APIView):
     def post(self, request):
-        email = request.data.get("email")
-        if not email:
-            return Response({"error": "Email kiritilishi shart"}, status=400)
+        serializer = RegisterSerializer(data=request.data)
+        if serializer.is_valid():
+            fullname = serializer.validated_data['fullname']
+            email = serializer.validated_data['email']
+            if User.objects.filter(email=email).exists():
+                return Response({'detail': 'Bu email allaqachon ro‘yxatdan o‘tgan.'}, status=400)
 
-        # Foydalanuvchi mavjud bo'lmasa, yaratamiz
-        user, _ = User.objects.get_or_create(email=email)
-
-        # Avvalgi kodlarni bekor qilamiz
-        EmailVerificationCode.objects.filter(email=email, is_used=False).update(is_used=True)
-
-        # Yangi kod yaratamiz
-        code = str(random.randint(100000, 999999))
-        EmailVerificationCode.objects.create(email=email, code=code)
-
-        try:
-            send_mail(
-                subject="Tasdiqlash kodingiz",
-                message=f"Sizning tasdiqlash kodingiz: {code}",
-                from_email="bekzodbek5201@gmail.com",
-                recipient_list=[email],
-                fail_silently=False,
-            )
-        except Exception as e:
-            return Response({"error": f"Email yuborilmadi: {str(e)}"}, status=500)
-
-        return Response({"message": f"{email} ga tasdiqlash kodi yuborildi."}, status=200)
+            EmailVerificationCode.objects.filter(email=email).delete()
+            code = send_verification_code(email)
+            return Response({'detail': 'Tasdiqlash kodi yuborildi.'})
+        return Response(serializer.errors, status=400)
 
 
-class VerifyCodeView(APIView):
+class RegisterVerifyView(APIView):
     def post(self, request):
-        email = request.data.get("email")
-        code = request.data.get("code")
+        serializer = RegisterVerifySerializer(data=request.data)
+        if serializer.is_valid():
+            email = serializer.validated_data['email']
+            code = serializer.validated_data['code']
+            try:
+                code_obj = EmailVerificationCode.objects.get(email=email, code=code, is_used=False)
+                if code_obj.is_expired():
+                    return Response({'detail': 'Kod eskirgan.'}, status=400)
+                code_obj.is_used = True
+                code_obj.save()
 
-        if not email or not code:
-            return Response({"error": "Email va kod kiritilishi shart"}, status=400)
+                fullname = request.data.get('fullname', email.split('@')[0])
+                user = User.objects.create_user(fullname=fullname, email=email)
+                user.is_active = True
+                user.save()
 
-        verification = EmailVerificationCode.objects.filter(
-            email=email, code=code, is_used=False
-        ).first()
+                refresh = RefreshToken.for_user(user)
+                return Response({
+                    'access': str(refresh.access_token),
+                    'refresh': str(refresh)
+                })
+            except EmailVerificationCode.DoesNotExist:
+                return Response({'detail': 'Noto‘g‘ri kod.'}, status=400)
+        return Response(serializer.errors, status=400)
 
-        if not verification:
-            return Response({"error": "Kod noto‘g‘ri yoki allaqachon ishlatilgan."}, status=400)
 
-        if verification.is_expired():
-            return Response({"error": "Kod muddati tugagan (5 daqiqa)."}, status=400)
+class LoginView(APIView):
+    def post(self, request):
+        serializer = LoginSerializer(data=request.data)
+        if serializer.is_valid():
+            email = serializer.validated_data['email']
+            try:
+                user = User.objects.get(email=email)
+            except User.DoesNotExist:
+                return Response({'detail': 'Iltimos, avval ro‘yxatdan o‘ting.'}, status=400)
 
-        # Kodni ishlatilgan deb belgilash
-        verification.is_used = True
-        verification.save()
+            EmailVerificationCode.objects.filter(email=email).delete()
+            send_verification_code(email)
+            return Response({'detail': 'Tasdiqlash kodi yuborildi.'})
+        return Response(serializer.errors, status=400)
 
-        # Foydalanuvchini faollashtirish
-        user = User.objects.get(email=email)
-        user.is_active = True
-        user.save()
 
-        # JWT tokenlar yaratish
-        refresh = RefreshToken.for_user(user)
-        return Response({
-            "access": str(refresh.access_token),
-            "refresh": str(refresh)
-        }, status=status.HTTP_200_OK)
+class LoginVerifyView(APIView):
+    def post(self, request):
+        serializer = LoginVerifySerializer(data=request.data)
+        if serializer.is_valid():
+            email = serializer.validated_data['email']
+            code = serializer.validated_data['code']
+            try:
+                code_obj = EmailVerificationCode.objects.get(email=email, code=code, is_used=False)
+                if code_obj.is_expired():
+                    return Response({'detail': 'Kod eskirgan.'}, status=400)
+                code_obj.is_used = True
+                code_obj.save()
+
+                user = User.objects.get(email=email)
+                refresh = RefreshToken.for_user(user)
+                return Response({
+                    'access': str(refresh.access_token),
+                    'refresh': str(refresh)
+                })
+            except EmailVerificationCode.DoesNotExist:
+                return Response({'detail': 'Noto‘g‘ri kod.'}, status=400)
+        return Response(serializer.errors, status=400)

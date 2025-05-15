@@ -1,31 +1,23 @@
 from rest_framework import serializers
-from .models import User
-import random
+from django.contrib.auth import get_user_model
+from .models import EmailVerificationCode
 
-class RegisterSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ['email']
+User = get_user_model()
 
-    def create(self, validated_data):
-        email = validated_data['email']
-        code = str(random.randint(100000, 999999))
 
-        user, created = User.objects.get_or_create(email=email)
-        user.verification_code = code
-        user.is_active = False
-        user.save()
+class RegisterSerializer(serializers.Serializer):
+    fullname = serializers.CharField()
+    email = serializers.EmailField()
 
-        from django.core.mail import send_mail
-        send_mail(
-            "Tasdiqlash kodi",
-            f"Sizning tasdiqlash kodingiz: {code}",
-            'bekzodbek5201@gmail.com',
-            [email],
-        )
+class RegisterVerifySerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    code = serializers.CharField(max_length=6)
 
-        return user
 
-class VerifySerializer(serializers.Serializer):
+class LoginSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+
+class LoginVerifySerializer(serializers.Serializer):
     email = serializers.EmailField()
     code = serializers.CharField(max_length=6)
