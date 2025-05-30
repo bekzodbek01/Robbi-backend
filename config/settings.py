@@ -40,8 +40,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'users',
+    'blog',
     'rest_framework_simplejwt',
     'drf_yasg',
+    'smart_selects',
+    'django_filters',
 ]
 
 MIDDLEWARE = [
@@ -76,24 +79,24 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-#
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'robbi_db',
-        'USER': 'robbi_user',
-        'PASSWORD': 'robbi_password',
-        'HOST': 'db_robbi',
-        'PORT': '5432',  # Mahalliy port (Docker Compose faylidan)..
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+#
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'robbi_db',
+#         'USER': 'robbi_user',
+#         'PASSWORD': 'robbi_password',
+#         'HOST': 'db_robbi',
+#         'PORT': '5432',  # Mahalliy port (Docker Compose faylidan)..
+#     }
+# }
 
 
 # Password validation
@@ -145,6 +148,10 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'mediafiles')  # media fayllar joylashadi
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+REST_FRAMEWORK = {
+
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
+}
 
 
 AUTH_USER_MODEL = 'users.User'

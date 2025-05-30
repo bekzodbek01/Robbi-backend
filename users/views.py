@@ -6,6 +6,8 @@ from .models import EmailVerificationCode
 from .serializers import *
 from .utils import send_verification_code
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.permissions import IsAuthenticated
+
 
 User = get_user_model()
 
@@ -89,5 +91,20 @@ class LoginVerifyView(APIView):
                     'refresh': str(refresh)
                 })
             except EmailVerificationCode.DoesNotExist:
-                return Response({'detail': 'Noto‘g‘ri kod.'}, status=400)
+                return Response({'detail': 'Noto‘g‘ri kod.'}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=400)
+
+
+class UserProfileView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        serializer = UserProfileSerializer(request.user, context={'request': request})
+        return Response(serializer.data)
+
+    def put(self, request):
+        serializer = UserProfileSerializer(request.user, data=request.data, partial=True, context={'request': request})
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

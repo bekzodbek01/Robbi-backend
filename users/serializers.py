@@ -9,6 +9,7 @@ class RegisterSerializer(serializers.Serializer):
     fullname = serializers.CharField()
     email = serializers.EmailField()
 
+
 class RegisterVerifySerializer(serializers.Serializer):
     email = serializers.EmailField()
     code = serializers.CharField(max_length=6)
@@ -21,3 +22,15 @@ class LoginSerializer(serializers.Serializer):
 class LoginVerifySerializer(serializers.Serializer):
     email = serializers.EmailField()
     code = serializers.CharField(max_length=6)
+
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['fullname', 'lastname', 'image']
+
+    def get_image(self, obj):
+        request = self.context.get('request')
+        if obj.image and hasattr(obj.image, 'url'):
+            return request.build_absolute_uri(obj.image.url)
+        return None
