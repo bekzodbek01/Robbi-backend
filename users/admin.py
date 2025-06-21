@@ -28,17 +28,17 @@ from .models import User, EmailVerificationCode
 
 class UserAdmin(BaseUserAdmin):
     model = User
-    list_display = ('id', 'fullname', 'lastname', 'email', 'is_active', 'is_staff')
+    list_display = ('id', 'fullname', 'email', 'is_active', 'is_staff')
     list_filter = ('is_active', 'is_staff')
     fieldsets = (
-        (None, {'fields': ('fullname', 'lastname', 'email', 'password', 'image')}),
+        (None, {'fields': ('fullname', 'email', 'password', 'image')}),
         ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
         ('Important dates', {'fields': ('last_login', 'date_joined')}),
     )
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('fullname', 'lastname', 'email', 'password1', 'password2', 'is_active', 'is_staff')}
+            'fields': ('fullname', 'email', 'password1', 'password2', 'is_active', 'is_staff')}
         ),
     )
     search_fields = ('fullname', 'email')

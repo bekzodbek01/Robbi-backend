@@ -27,7 +27,7 @@ class LoginVerifySerializer(serializers.Serializer):
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['fullname', 'lastname', 'image']
+        fields = ['fullname', 'image']
 
     def get_image(self, obj):
         request = self.context.get('request')
