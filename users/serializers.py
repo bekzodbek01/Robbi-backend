@@ -25,6 +25,8 @@ class LoginVerifySerializer(serializers.Serializer):
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
+
     class Meta:
         model = User
         fields = ['fullname', 'image']
