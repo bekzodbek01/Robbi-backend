@@ -23,6 +23,11 @@ services:
       POSTGRES_PASSWORD: robbi_password  # settings.py da PASSWORD
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U robbi_user -d robbi_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
 volumes:
   postgres_data:
