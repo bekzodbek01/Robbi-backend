@@ -8,6 +8,7 @@ from datetime import timedelta
 class EmailVerificationCode(models.Model):
     email = models.EmailField()
     code = models.CharField(max_length=6)
+    fullname = models.CharField(max_length=255, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     is_used = models.BooleanField(default=False)
 
