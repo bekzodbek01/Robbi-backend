@@ -5,6 +5,7 @@ from .nomoz_vaqtlar import NamozVaqtlariAPIView
 urlpatterns = [
     path('city/', city_list, name='city_list'),  # Shahar ro'yxati
     path('regions/<int:pk>/in_city/', RegionWithCitiesAPIView.as_view(), name='region_in_city'),
+    path('regions/', RegionListAPIView.as_view(), name='region-list'),
     path('general/', General_list, name='lgeneral_list'),
     path('generals/', GeneralListAPIView.as_view(), name='general_filter'),
     path('generals/<int:pk>/', generals_by_category, name='generals-by-category'),

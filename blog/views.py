@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from .serializers import *
 from rest_framework.decorators import api_view
-from .models import General, Category, RestaurantFilter, ParkFilter, KalinkaFilter
+from .models import General, Category, RestaurantFilter, ParkFilter, KalinkaFilter, Region
 from django.db.models import Q
 
 
@@ -15,11 +15,11 @@ def city_list(request):
     return Response(serializer.data)
 
 
-@api_view(['GET'])
-def region_list(request):
-    regions = Region.objects.all()
-    serializer = RegionSerializer(regions, many=True, context={"request": request})
-    return Response(serializer.data)
+class RegionListAPIView(APIView):
+    def get(self, request):
+        regions = Region.objects.all()
+        serializer = RegionSerializers(regions, many=True, context={'request': request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class RegionWithCitiesAPIView(APIView):

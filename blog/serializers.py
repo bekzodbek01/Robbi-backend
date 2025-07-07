@@ -6,6 +6,7 @@ from datetime import datetime
 from django.utils.timezone import localtime, now
 import django_filters
 
+
 class CitySerializer(serializers.ModelSerializer):
     class Meta:
         model = City
@@ -18,6 +19,13 @@ class RegionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Region
         fields = ['id', 'title', 'cities']
+
+
+class RegionSerializers(serializers.ModelSerializer):
+
+    class Meta:
+        model = Region
+        fields = ['id', 'title',]
 
 
 class GeneralimageSerializer(serializers.ModelSerializer):
