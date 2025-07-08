@@ -69,13 +69,16 @@ class MenuCategorySerializer(serializers.ModelSerializer):
 class GeneralSerializer(serializers.ModelSerializer):
     images = GeneralimageSerializer(many=True, read_only=True)
     menu_categories = serializers.SerializerMethodField()
-    open_now = django_filters.BooleanFilter(method='filter_open_now')
+    is_open_now = serializers.SerializerMethodField()
 
     class Meta:
         model = General
         fields = [
-            'id', 'name', 'image', 'address', 'phone', 'lat', 'long', 'description', 'open_time', 'close_time',
-            'tier', 'star_rating', 'delivery_available', 'region', 'city', 'images', 'menu_categories'
+            'id', 'name', 'image', 'address', 'phone', 'lat', 'long',
+            'description', 'open_time', 'close_time',  # ✅ TO‘G‘RI
+            'tier', 'star_rating', 'delivery_available',
+            'region', 'city', 'images', 'menu_categories',
+            'is_open_now'  # ✅ Dynamic field
         ]
         depth = 1
 
@@ -83,20 +86,16 @@ class GeneralSerializer(serializers.ModelSerializer):
         categories = MenuCategory.objects.filter(items__general=obj).distinct()
         return MenuCategorySerializer(categories, many=True).data
 
-    def filter_open_now(self, queryset, name, value):
-        if value:  # ?open_now=true bo'lsa
-            current_time = localtime(now()).time()  # hozirgi mahalliy vaqtni olamiz
-            return queryset.filter(
-                open_time__lte=current_time,
-                close_time__gte=current_time
-            )
-        return queryset
+    def get_is_open_now(self, obj):
+        current_time = localtime(now()).time()
+        return obj.open_time <= current_time <= obj.close_time
 
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = ['id', 'name',]
+        fields = ['id', 'name', 'image', 'icon_background_color', 'icon_background_color_night',
+                  'Ln_background_color', 'Ln_background_color_night']
 
 
 class CategoryeSerializer(serializers.ModelSerializer):

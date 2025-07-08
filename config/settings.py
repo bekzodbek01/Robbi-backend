@@ -123,11 +123,13 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
-
+TIME_ZONE = 'Asia/Tashkent'  # To‘g‘ri yozilishi shart
 USE_I18N = True
-
 USE_TZ = True
+
+import os
+os.environ['TZ'] = 'Asia/Tashkent'  # Ixtiyoriy, lekin zarar qilmaydi
+
 
 
 # Static files (CSS, JavaScript, Images)

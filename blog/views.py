@@ -102,32 +102,31 @@ class MenuCategoryListView(APIView):
         serializer = MenuCategorySerializer(categories, many=True, context={'request': request})
         return Response(serializer.data)
 
-
-import django_filters
-from rest_framework import generics, filters
+from rest_framework import generics, filters as drf_filters
+from django_filters import rest_framework as dj_filters
 from django_filters.rest_framework import DjangoFilterBackend
+from django.utils.timezone import localtime, now
 from .models import General
 from .serializers import GeneralSerializer
 
 
-class GeneralFilter(django_filters.FilterSet):
-    category = django_filters.NumberFilter(field_name='category__id')
-    name = django_filters.CharFilter(field_name='name', lookup_expr='icontains')
-    open_now = django_filters.BooleanFilter(method='filter_open_now')
-    delivery_available = django_filters.BooleanFilter(field_name='delivery_available')
-    tier = django_filters.MultipleChoiceFilter(field_name='tier', choices=General.TIER_CHOICES)
-    star_rating = django_filters.RangeFilter(field_name='star_rating')
-    rest_filter__name = django_filters.CharFilter(field_name='rest_filter__name', lookup_expr='icontains')
-    kalinka_filter__name = django_filters.CharFilter(field_name='kalinka_filter__name', lookup_expr='icontains')
-    park_filter__name = django_filters.CharFilter(field_name='park_filter__name', lookup_expr='icontains')
-    region = django_filters.NumberFilter(field_name='region__id')
-    city = django_filters.NumberFilter(field_name='city__id')
+class GeneralFilter(dj_filters.FilterSet):
+    open_now = dj_filters.BooleanFilter(method='filter_open_now')  # Qo‘shildi
+    name = dj_filters.CharFilter(field_name='name', lookup_expr='icontains')
+    delivery_available = dj_filters.BooleanFilter(field_name='delivery_available')
+    tier = dj_filters.MultipleChoiceFilter(field_name='tier', choices=General.TIER_CHOICES)
+    star_rating = dj_filters.RangeFilter(field_name='star_rating')
+    rest_filter__name = dj_filters.CharFilter(field_name='rest_filter__name', lookup_expr='icontains')
+    kalinka_filter__name = dj_filters.CharFilter(field_name='kalinka_filter__name', lookup_expr='icontains')
+    park_filter__name = dj_filters.CharFilter(field_name='park_filter__name', lookup_expr='icontains')
+    region = dj_filters.NumberFilter(field_name='region__id')
+    city = dj_filters.NumberFilter(field_name='city__id')
 
     class Meta:
         model = General
         fields = [
-            'name',
             'open_now',
+            'name',
             'delivery_available',
             'tier',
             'star_rating',
@@ -136,24 +135,16 @@ class GeneralFilter(django_filters.FilterSet):
             'park_filter__name',
             'region',
             'city',
-            'category',
         ]
 
     def filter_open_now(self, queryset, name, value):
         if value:
-            from django.utils.timezone import localtime, now
             current_time = localtime(now()).time()
             return queryset.filter(open_time__lte=current_time, close_time__gte=current_time)
         return queryset
 
 
-class GeneralListAPIView(generics.ListAPIView):
-    queryset = General.objects.all()
-    serializer_class = GeneralSerializer
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_class = GeneralFilter
-    search_fields = ['name']  # nom bo‘yicha qidirish
-    ordering_fields = ['open_time', 'close_time', 'star_rating']
+
 
 
 @api_view(['GET'])
@@ -163,8 +154,13 @@ def generals_by_category(request, pk):
     except Category.DoesNotExist:
         return Response({"error": "Category topilmadi"}, status=status.HTTP_404_NOT_FOUND)
 
+    # Faqat shu kategoriyadagi General larni olib
     generals = General.objects.filter(category_id=pk)
-    serializer = GeneralSerializer(generals, many=True, context={'request': request})
+
+    # GeneralFilter orqali barcha filterlarni qo‘llash
+    filtered_qs = GeneralFilter(request.GET, queryset=generals).qs
+
+    serializer = GeneralSerializer(filtered_qs, many=True, context={'request': request})
 
     return Response({
         "category_name": category.name,

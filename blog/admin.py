@@ -33,7 +33,8 @@ class GeneralAdmin(admin.ModelAdmin):
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name']
+    list_display = ['id', 'name', 'image', 'icon_background_color', 'icon_background_color_night',
+                    'Ln_background_color', 'Ln_background_color_night']
 
 
 @admin.register(MenuCategory)

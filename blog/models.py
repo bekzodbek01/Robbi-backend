@@ -27,7 +27,12 @@ class City(models.Model):
 
 
 class Category(models.Model):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255,  blank=True, null=True)
+    image = models.FileField(upload_to='category', blank=True, null=True)
+    icon_background_color = models.CharField(max_length=60, blank=True, null=True)
+    icon_background_color_night = models.CharField(max_length=60, blank=True, null=True)
+    Ln_background_color = models.CharField(max_length=60, blank=True, null=True)
+    Ln_background_color_night = models.CharField(max_length=60, blank=True, null=True)
 
     def __str__(self):
         return self.name
