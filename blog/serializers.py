@@ -96,10 +96,3 @@ class CategorySerializer(serializers.ModelSerializer):
         model = Category
         fields = ['id', 'name', 'image', 'icon_background_color', 'icon_background_color_night',
                   'Ln_background_color', 'Ln_background_color_night']
-
-
-class CategoryeSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Category
-        fields = ['id', 'name',]

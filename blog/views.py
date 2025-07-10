@@ -80,7 +80,7 @@ def General_list(request):
 @api_view(['GET'])
 def category_list(request):
     category = Category.objects.all()
-    serializer = CategoryeSerializer(category, many=True, context={'request': request})
+    serializer = CategorySerializer(category, many=True, context={'request': request})
     return Response(serializer.data)
 
 
