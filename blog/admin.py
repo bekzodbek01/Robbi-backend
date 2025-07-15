@@ -29,6 +29,7 @@ class GeneralAdmin(admin.ModelAdmin):
               'open_time', 'close_time', 'tier', 'star_rating', 'delivery_available',]
 
     inlines = [GeneralImageAdmin]
+    filter_horizontal = ('rest_filter',)
 
 
 @admin.register(Category)

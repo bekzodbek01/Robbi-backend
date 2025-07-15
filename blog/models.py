@@ -96,7 +96,7 @@ class General(models.Model):
     lat = models.FloatField(blank=True, null=True, verbose_name='Latitude')
     long = models.FloatField(blank=True, null=True, verbose_name='Longitude')
     description = models.TextField(blank=True, null=True)
-    rest_filter = models.ForeignKey(RestaurantFilter, on_delete=models.SET_NULL, blank=True, null=True, related_name='restaurants')
+    rest_filter = models.ManyToManyField(RestaurantFilter, blank=True, related_name='restaurants')
     kalinka_filter = models.ForeignKey(KalinkaFilter, on_delete=models.SET_NULL, blank=True, null=True, related_name='kalinka')
     park_filter = models.ForeignKey(ParkFilter, on_delete=models.SET_NULL, blank=True, null=True, related_name='parks')
     category = models.ForeignKey(Category, related_name='category', on_delete=models.CASCADE, blank=True, null=True,)
