@@ -99,8 +99,8 @@ class General(models.Model):
     rest_filter = models.ForeignKey(RestaurantFilter, on_delete=models.SET_NULL, blank=True, null=True, related_name='restaurants')
     kalinka_filter = models.ForeignKey(KalinkaFilter, on_delete=models.SET_NULL, blank=True, null=True, related_name='kalinka')
     park_filter = models.ForeignKey(ParkFilter, on_delete=models.SET_NULL, blank=True, null=True, related_name='parks')
-    category = models.ForeignKey(Category, related_name='category', on_delete=models.CASCADE)
-    region = models.ForeignKey(Region, on_delete=models.CASCADE)
+    category = models.ForeignKey(Category, related_name='category', on_delete=models.CASCADE, blank=True, null=True,)
+    region = models.ForeignKey(Region, on_delete=models.CASCADE, blank=True, null=True,)
     city = ChainedForeignKey(
         City,
         chained_field="region",

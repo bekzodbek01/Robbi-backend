@@ -88,6 +88,10 @@ class GeneralSerializer(serializers.ModelSerializer):
 
     def get_is_open_now(self, obj):
         current_time = localtime(now()).time()
+
+        if obj.open_time is None or obj.close_time is None:
+            return False  # Yoki `return None`, agar siz noaniqlikni ko‘rsatmoqchi bo‘lsangiz
+
         return obj.open_time <= current_time <= obj.close_time
 
 
