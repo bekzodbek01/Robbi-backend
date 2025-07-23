@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from .serializers import *
 from rest_framework.decorators import api_view
-from .models import General, Category, RestaurantFilter, ParkFilter, KalinkaFilter, Region
+from .models import General, Category, RestaurantFilter, ParkFilter, KalinkaFilter, Region, Helper
 from django.db.models import Q
 
 
@@ -102,6 +102,7 @@ class MenuCategoryListView(APIView):
         serializer = MenuCategorySerializer(categories, many=True, context={'request': request})
         return Response(serializer.data)
 
+
 from rest_framework import generics, filters as drf_filters
 from django_filters import rest_framework as dj_filters
 from django_filters.rest_framework import DjangoFilterBackend
@@ -167,3 +168,20 @@ def generals_by_category(request, pk):
         'id': category.id,
         "generals": serializer.data
     })
+
+
+
+@api_view(['GET'])
+def helper_by_general(request, pk):
+    try:
+        general = General.objects.get(id=pk)
+    except General.DoesNotExist:
+        return Response({'error': 'General topilmadi'}, status=status.HTTP_404_NOT_FOUND)
+
+    try:
+        helper = general.helper  # related_name='helper' orqali
+    except Helper.DoesNotExist:
+        return Response({'message': 'Helper mavjud emas'}, status=status.HTTP_204_NO_CONTENT)
+
+    serializer = HelperSerializer(helper)
+    return Response(serializer.data)

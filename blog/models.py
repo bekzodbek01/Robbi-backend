@@ -75,6 +75,9 @@ class ParkFilter(models.Model):
         verbose_name_plural = "Park Filters"
 
 
+from smart_selects.db_fields import ChainedForeignKey
+
+
 class General(models.Model):
     TIER_CHOICES = [
         ('gold', 'Gold'),
@@ -92,15 +95,12 @@ class General(models.Model):
     name = models.CharField(max_length=100, blank=True, null=True)
     image = models.ImageField(upload_to='image', blank=True, null=True)
     address = models.CharField(max_length=255, blank=True, null=True)
-    phone = models.CharField(max_length=50, blank=True, null=True)
-    lat = models.FloatField(blank=True, null=True, verbose_name='Latitude')
-    long = models.FloatField(blank=True, null=True, verbose_name='Longitude')
-    description = models.TextField(blank=True, null=True)
-    rest_filter = models.ManyToManyField(RestaurantFilter, blank=True, related_name='restaurants')
-    kalinka_filter = models.ForeignKey(KalinkaFilter, on_delete=models.SET_NULL, blank=True, null=True, related_name='kalinka')
-    park_filter = models.ForeignKey(ParkFilter, on_delete=models.SET_NULL, blank=True, null=True, related_name='parks')
-    category = models.ForeignKey(Category, related_name='category', on_delete=models.CASCADE, blank=True, null=True,)
-    region = models.ForeignKey(Region, on_delete=models.CASCADE, blank=True, null=True,)
+    region = models.ForeignKey(
+        Region,
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True
+    )
     city = ChainedForeignKey(
         City,
         chained_field="region",
@@ -108,10 +108,16 @@ class General(models.Model):
         show_all=False,
         auto_choose=True,
         sort=True,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True
     )
     open_time = models.TimeField(blank=True, null=True)
     close_time = models.TimeField(blank=True, null=True)
+    rest_filter = models.ManyToManyField(RestaurantFilter, blank=True, related_name='restaurants')
+    kalinka_filter = models.ForeignKey(KalinkaFilter, on_delete=models.SET_NULL, blank=True, null=True, related_name='kalinka')
+    park_filter = models.ForeignKey(ParkFilter, on_delete=models.SET_NULL, blank=True, null=True, related_name='parks')
+    category = models.ForeignKey(Category, related_name='category', on_delete=models.CASCADE, blank=True, null=True)
     delivery_available = models.BooleanField(default=False)
     tier = models.CharField(max_length=10, choices=TIER_CHOICES, blank=True, null=True)
     star_rating = models.PositiveSmallIntegerField(choices=STAR_RATINGS, blank=True, null=True, verbose_name="Yulduzlar soni")
@@ -122,6 +128,21 @@ class General(models.Model):
     class Meta:
         verbose_name = "General Place"
         verbose_name_plural = "General Places"
+
+
+class Helper(models.Model):
+    general = models.OneToOneField(General, on_delete=models.CASCADE, related_name='helper')
+    phone = models.CharField(max_length=50, blank=True, null=True)
+    lat = models.FloatField(blank=True, null=True, verbose_name='Latitude')
+    long = models.FloatField(blank=True, null=True, verbose_name='Longitude')
+    description = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return str(self.general)
+
+    class Meta:
+        verbose_name = "Helper"
+        verbose_name_plural = "Helper"
 
 
 class GeneralImage(models.Model):
@@ -148,7 +169,7 @@ class MenuItem(models.Model):
     image = models.ImageField(upload_to='menu_items/', blank=True, null=True)
 
     def __str__(self):
-        return self.name or 'Unnamed item'
+        return self.name or 'No name'
 
     class Meta:
         verbose_name = "Menu Item"

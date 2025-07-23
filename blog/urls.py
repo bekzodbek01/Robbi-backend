@@ -8,6 +8,8 @@ urlpatterns = [
     path('regions/', RegionListAPIView.as_view(), name='region-list'),
     path('generals/', General_list, name='lgeneral_list'),
     path('generals/<int:pk>/', generals_by_category, name='generals-by-category'),
+    path('helper/<int:pk>/', helper_by_general, name='helper'),
+
 
     path('category/', category_list, name='category_list'),
 
