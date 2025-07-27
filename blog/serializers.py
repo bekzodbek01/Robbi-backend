@@ -42,14 +42,13 @@ class GeneralimageSerializer(serializers.ModelSerializer):
 
 
 class GeneralSerializer(serializers.ModelSerializer):
-    images = GeneralimageSerializer(many=True, read_only=True)
     is_open_now = serializers.SerializerMethodField()
 
     class Meta:
         model = General
         fields = [
             'id', 'name', 'image', 'address', 'open_time', 'close_time',
-            'tier', 'star_rating', 'delivery_available', 'region', 'city', 'is_open_now', 'images'
+            'tier', 'star_rating', 'delivery_available', 'region', 'city', 'is_open_now',
         ]
         depth = 1
 
@@ -63,10 +62,11 @@ class GeneralSerializer(serializers.ModelSerializer):
 
 
 class HelperSerializer(serializers.ModelSerializer):
+    images = GeneralimageSerializer(many=True, read_only=True)
 
     class Meta:
         model = Helper
-        fields = ['id', 'general', 'phone', 'lat', 'long', 'description',]
+        fields = ['id', 'general', 'phone', 'lat', 'long', 'description', 'images']
 
 
 class MenuItemSerializer(serializers.ModelSerializer):

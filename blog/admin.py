@@ -13,15 +13,15 @@ class RegionAdmin(admin.ModelAdmin):
     inlines = [CityInline]
 
 
-class GeneralImageAdmin(admin.TabularInline):
+class GeneralImageInline(admin.TabularInline):
     model = GeneralImage
-    list_display = ['id', 'general', 'image']
+    extra = 1
 
 
-class HelperInline(admin.StackedInline):
-    model = Helper
-    extra = 0  # Yangi bo'sh form qo‘shilmaydi avtomatik
-    max_num = 1
+@admin.register(Helper)
+class HelperAdmin(admin.ModelAdmin):
+    list_display = ['id', 'general', 'phone', 'lat', 'long']
+    inlines = [GeneralImageInline]  # Shu yerda rasmlar chiqadi
 
 
 @admin.register(General)
@@ -33,7 +33,6 @@ class GeneralAdmin(admin.ModelAdmin):
     fields = ['category', 'name', 'image', 'address', 'region', 'city',
               'kalinka_filter', 'park_filter', 'rest_filter',
               'open_time', 'close_time', 'tier', 'star_rating', 'delivery_available',]
-    inlines = [HelperInline, GeneralImageAdmin]
 
     filter_horizontal = ('rest_filter',)
 

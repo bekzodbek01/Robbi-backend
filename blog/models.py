@@ -146,7 +146,7 @@ class Helper(models.Model):
 
 
 class GeneralImage(models.Model):
-    general = models.ForeignKey(General, on_delete=models.CASCADE, related_name='images')
+    general = models.ForeignKey(Helper, on_delete=models.CASCADE, related_name='images')
     image = models.ImageField(upload_to='general_images/', blank=True, null=True)
 
 

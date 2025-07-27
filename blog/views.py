@@ -152,15 +152,10 @@ def generals_by_category(request, pk):
     except Category.DoesNotExist:
         return Response({"error": "Category topilmadi"}, status=status.HTTP_404_NOT_FOUND)
 
-    # Faqat shu kategoriyadagi General larni olish
+    # Faqat shu kategoriyadagi General larni olib
     generals = General.objects.filter(category_id=pk)
 
-    # Agar `id` kelsa (General ID), shuni filter qilamiz
-    general_id = request.GET.get("id")
-    if general_id:
-        generals = generals.filter(id=general_id)
-
-    # GeneralFilter orqali qo‘shimcha filterlarni qo‘llash
+    # GeneralFilter orqali barcha filterlarni qo‘llash
     filtered_qs = GeneralFilter(request.GET, queryset=generals).qs
 
     serializer = GeneralSerializer(filtered_qs, many=True, context={'request': request})
