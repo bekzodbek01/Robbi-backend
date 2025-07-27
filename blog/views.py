@@ -145,9 +145,6 @@ class GeneralFilter(dj_filters.FilterSet):
         return queryset
 
 
-
-
-
 @api_view(['GET'])
 def generals_by_category(request, pk):
     try:
@@ -155,10 +152,15 @@ def generals_by_category(request, pk):
     except Category.DoesNotExist:
         return Response({"error": "Category topilmadi"}, status=status.HTTP_404_NOT_FOUND)
 
-    # Faqat shu kategoriyadagi General larni olib
+    # Faqat shu kategoriyadagi General larni olish
     generals = General.objects.filter(category_id=pk)
 
-    # GeneralFilter orqali barcha filterlarni qo‘llash
+    # Agar `id` kelsa (General ID), shuni filter qilamiz
+    general_id = request.GET.get("id")
+    if general_id:
+        generals = generals.filter(id=general_id)
+
+    # GeneralFilter orqali qo‘shimcha filterlarni qo‘llash
     filtered_qs = GeneralFilter(request.GET, queryset=generals).qs
 
     serializer = GeneralSerializer(filtered_qs, many=True, context={'request': request})
@@ -168,7 +170,6 @@ def generals_by_category(request, pk):
         'id': category.id,
         "generals": serializer.data
     })
-
 
 
 @api_view(['GET'])
