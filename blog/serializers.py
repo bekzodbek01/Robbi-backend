@@ -47,8 +47,9 @@ class GeneralSerializer(serializers.ModelSerializer):
     class Meta:
         model = General
         fields = [
-            'id', 'name', 'image', 'address', 'open_time', 'close_time',
-            'tier', 'star_rating', 'delivery_available', 'region', 'city', 'is_open_now',
+            'id', 'name', 'image', 'address', 'open_time', 'close_time', 'tier', 'star_rating', 'delivery_available',
+            'region', 'city', 'kalinka_filter', 'park_filter', 'rest_filter',  'is_open_now',
+
         ]
         depth = 1
 
