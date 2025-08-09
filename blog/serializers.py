@@ -64,11 +64,17 @@ class GeneralSerializer(serializers.ModelSerializer):
 
 class HelperSerializer(serializers.ModelSerializer):
     images = GeneralimageSerializer(many=True, read_only=True)
+    # Shu yerda General'dan ma'lumotlarni olib kelamiz
+    address = serializers.CharField(source='general.address', read_only=True)
+    open_time = serializers.TimeField(source='general.open_time', read_only=True)
+    close_time = serializers.TimeField(source='general.close_time', read_only=True)
 
     class Meta:
         model = Helper
-        fields = ['id', 'general', 'phone', 'lat', 'long', 'description', 'images']
-
+        fields = [
+            'id', 'general', 'phone', 'lat', 'long', 'description',
+            'images', 'address', 'open_time', 'close_time'
+        ]
 
 class MenuItemSerializer(serializers.ModelSerializer):
     class Meta:
