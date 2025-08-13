@@ -15,7 +15,7 @@ urlpatterns = [
 
     path('restfilter/', RestaurantFilter_list, name='restfilter_list'),
     path('parkfilter/', ParkFilter_list, name='parkfilter_list'),
-    path('kalinkafilter/', category_list, name='kalinkafilter_list'),
+    path('kalinkafilter/', KalinkaFilter_list, name='kalinkafilter_list'),
 
     path('menu/<int:id>/', MenuCategoryListView.as_view(), name='menu-category-list'),
     path('namoz-vaqtlari/', NamozVaqtlariAPIView.as_view(), name='namoz-vaqtlari'),
