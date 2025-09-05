@@ -39,27 +39,32 @@ class GeneralimageSerializer(serializers.ModelSerializer):
     class Meta:
         model = GeneralImage
         fields = ['id', 'image']
-
-
 class GeneralSerializer(serializers.ModelSerializer):
     is_open_now = serializers.SerializerMethodField()
+    lat = serializers.SerializerMethodField()
+    long = serializers.SerializerMethodField()
 
     class Meta:
         model = General
         fields = [
-            'id', 'name', 'image', 'address', 'open_time', 'close_time', 'tier', 'star_rating', 'delivery_available',
-            'region', 'city', 'kalinka_filter', 'park_filter', 'rest_filter',  'is_open_now',
-
+            'id', 'name', 'image', 'address', 'open_time', 'close_time',
+            'tier', 'star_rating', 'delivery_available',
+            'region', 'city', 'kalinka_filter', 'park_filter', 'rest_filter',
+            'is_open_now', 'lat', 'long'
         ]
         depth = 1
 
     def get_is_open_now(self, obj):
         current_time = localtime(now()).time()
-
         if obj.open_time is None or obj.close_time is None:
-            return False  # Yoki `return None`, agar siz noaniqlikni ko‘rsatmoqchi bo‘lsangiz
-
+            return False
         return obj.open_time <= current_time <= obj.close_time
+
+    def get_lat(self, obj):
+        return obj.helper.lat if hasattr(obj, 'helper') and obj.helper else None
+
+    def get_long(self, obj):
+        return obj.helper.long if hasattr(obj, 'helper') and obj.helper else None
 
 
 class HelperSerializer(serializers.ModelSerializer):
